@@ -15,8 +15,8 @@ class ModeldiffMixin(models.Model):
     model_name = models.CharField(max_length=50)
     model_id = models.IntegerField(blank=True, null=True)
     action = models.CharField(max_length=6)
-    old_data = models.CharField(max_length=1024)
-    new_data = models.CharField(max_length=1024)
+    old_data = models.TextField()
+    new_data = models.TextField()
     applied = models.BooleanField(default=False)
 
     class Meta:
