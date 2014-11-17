@@ -63,6 +63,19 @@ class ModeldiffTests(TestCase):
                           u'the_geom': u'POINT(0.00000000 0.00000000)'})
         self.assertEqual(json.loads(diff.new_data), {'name': 'John'})
 
+    def test_delete_model(self):
+        person = PersonModel.objects.get(pk=1)
+        self.assertEqual(person.pk, 1)
+        person.delete()
+
+        diff = Geomodeldiff.objects.get(pk=2)
+        self.assertEqual(diff.action, 'delete')
+        self.assertEqual(diff.model_id, 1)
+        self.assertEqual(json.loads(diff.old_data),
+                         {u'name': u'Foo', u'surname': u'Doe',
+                          u'the_geom': u'POINT(0.00000000 0.00000000)'})
+        self.assertEqual(json.loads(diff.new_data), {})
+
     def test_set_to_none(self):
         person = PersonModel.objects.get(pk=1)
         self.assertEqual(person.pk, 1)

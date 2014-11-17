@@ -33,8 +33,63 @@ class Geomodeldiff(ModeldiffMixin, models.Model):
 
 
 class SaveModeldiffMixin(models.Model):
-    # TODO
-    pass
+    """
+    Use real=True to access the real save function
+    otherwise the Modeldiff logic will apply
+    """
+    def save(self, *args, **kwargs):
+        # see if we need to save the object (real = True)
+        # or should generate a Modeldiff (real = False)
+        real = kwargs.get('real', False)
+
+        if real:
+            # call original handler
+            kwargs.pop('real')
+            super(SaveModeldiffMixin, self).save(*args, **kwargs)
+            return
+
+        fields = self.Modeldiff.fields
+
+        diff = Modeldiff()
+        diff.model_name = self.Modeldiff.model_name
+        if hasattr(self, 'username'):
+            diff.username = self.username
+
+        if self.pk:
+            diff.model_id = self.pk
+            diff.action = 'update'
+            # get original object in database
+            original = self.__class__.objects.get(pk=self.pk)
+
+            # compare original and current (self)
+            old_values = {}
+            new_values = {}
+            for k in fields:
+                old_value = getattr(original, k)
+                old_values[k] = old_value
+                new_value = getattr(self, k)
+                if not new_value == old_value:
+                    new_values[k] = new_value
+
+            diff.old_data = json.dumps(old_values)
+            diff.new_data = json.dumps(new_values)
+            diff.save()
+        else:
+            diff.action = 'add'
+            # save all new values
+            new_values = {}
+            for f in fields:
+                new_values[f] = getattr(self, f)
+            diff.new_data = json.dumps(new_values)
+            diff.save()
+
+        super(SaveModeldiffMixin, self).save(*args, **kwargs)
+        if diff.model_id is None and self.pk:
+            diff.model_id = self.pk
+            diff.save()
+
+    class Meta:
+        abstract = True
 
 
 class SaveGeomodeldiffMixin(models.Model):
@@ -117,6 +172,49 @@ class SaveGeomodeldiffMixin(models.Model):
         if diff.model_id is None and self.pk:
             diff.model_id = self.pk
             diff.save()
+
+    def delete(self, *args, **kwargs):
+        real = kwargs.get('real', False)
+
+        if real:
+            # call original handler
+            kwargs.pop('real')
+            super(SaveGeomodeldiffMixin, self).delete(*args, **kwargs)
+            return
+
+        fields = self.Modeldiff.fields
+        geom_field = self.Modeldiff.geom_field
+        geom_precision = self.Modeldiff.geom_precision
+
+        diff = Geomodeldiff()
+        diff.model_name = self.Modeldiff.model_name
+        if hasattr(self, 'username'):
+            diff.username = self.username
+
+        if self.pk:
+            diff.model_id = self.pk
+            diff.action = 'delete'
+            # get original object in database
+            original = self.__class__.objects.get(pk=self.pk)
+
+            # save old values
+            old_values = {}
+            for k in fields:
+                old_value = getattr(self, k)
+                old_values[k] = old_value
+
+            # save geometry
+            geom = getattr(self, geom_field)
+            diff.the_geom = geom
+            if geom:
+                old_values[geom_field] = precision_wkt(geom, geom_precision)
+            else:
+                old_values[geom_field] = None
+
+            diff.old_data = json.dumps(old_values)
+            diff.save()
+
+        super(SaveGeomodeldiffMixin, self).delete(*args, **kwargs)
 
     class Meta:
         abstract = True
