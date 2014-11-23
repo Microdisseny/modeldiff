@@ -6,6 +6,10 @@ When saving a model, store the changes in a modeldiff object so they can be appl
 Usage
 -----
 
+Add ''modeldiff'' to INSTALLED_APPS
+
+Run ''manage.py migrate''
+
 Add a Modeldiff class inside the model you want to track, much like the normal Meta class:
 
 ```
