@@ -35,7 +35,8 @@ class ModeldiffTests(TestCase):
         self.assertEqual(diff.model_name, 'modeldiff.PersonModel')
         self.assertEqual(diff.old_data, '')
         self.assertEqual(json.loads(diff.new_data),
-                         {'name': 'Foo', 'surname': 'Doe'})
+                         {'name': 'Foo', 'surname': 'Doe',
+                          'the_geom': 'POINT(0.00000000 0.00000000)'})
         self.assertEqual(precision_wkt(diff.the_geom, 8),
                          'POINT(0.00000000 0.00000000)')
 

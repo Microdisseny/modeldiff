@@ -160,12 +160,12 @@ class SaveGeomodeldiffMixin(models.Model):
             new_values = {}
             for f in fields:
                 new_values[f] = getattr(self, f)
-            diff.new_data = json.dumps(new_values)
             new_geom = getattr(self, geom_field)
             diff.the_geom = new_geom
             if new_geom:
                 new_values[geom_field] = precision_wkt(new_geom,
                                                        geom_precision)
+            diff.new_data = json.dumps(new_values)
             diff.save()
 
         super(SaveGeomodeldiffMixin, self).save(*args, **kwargs)
