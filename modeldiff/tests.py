@@ -74,7 +74,7 @@ class ModeldiffTests(TestCase):
         self.assertEqual(json.loads(diff.old_data),
                          {u'name': u'Foo', u'surname': u'Doe',
                           u'the_geom': u'POINT(0.00000000 0.00000000)'})
-        self.assertEqual(json.loads(diff.new_data), {})
+        self.assertEqual(diff.new_data, '')
 
     def test_set_to_none(self):
         person = PersonModel.objects.get(pk=1)
