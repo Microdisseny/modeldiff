@@ -1,6 +1,8 @@
 from django.contrib.gis.db import models
 from django.contrib.gis.utils.wkt import precision_wkt
 
+from modeldiff.request import GlobalRequest
+
 import json
 
 
@@ -54,6 +56,11 @@ class SaveModeldiffMixin(models.Model):
         diff.model_name = self.Modeldiff.model_name
         if hasattr(self, 'username'):
             diff.username = self.username
+        else:
+            try:
+                user = GlobalRequest().user.username
+            except:
+                pass
 
         if self.pk:
             diff.model_id = self.pk
