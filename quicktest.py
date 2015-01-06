@@ -26,8 +26,21 @@ class QuickDjangoTest(object):
 
     def __init__(self, *args, **kwargs):
         self.apps = args
+        self.version = self.get_test_version()
         self.run_tests()
 
+    def get_test_version(self):
+        """
+        Figure out which version of Django's test suite we have to play with.
+        """
+        from django import VERSION
+        if VERSION[0] == 1 and VERSION[1] >= 7:
+            return '1.7'
+        elif VERSION[0] == 1 and VERSION[1] >= 2:
+            return '1.2'
+        else:
+            return
+        
     def run_tests(self):
         """
         Fire up the Django test suite developed for version 1.2
@@ -46,6 +59,9 @@ class QuickDjangoTest(object):
             INSTALLED_APPS=self.INSTALLED_APPS + self.apps,
         )
         from django.test.simple import DjangoTestSuiteRunner
+        if self.version == '1.7':
+            import django
+            django.setup()
         failures = DjangoTestSuiteRunner().run_tests(self.apps, verbosity=1)
         if failures:  # pragma: no cover
             sys.exit(failures)
