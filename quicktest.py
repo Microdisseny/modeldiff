@@ -57,6 +57,7 @@ class QuickDjangoTest(object):
                 }
             },
             INSTALLED_APPS=self.INSTALLED_APPS + self.apps,
+            USE_TZ=True,
         )
         from django.test.simple import DjangoTestSuiteRunner
         if self.version == '1.7':
