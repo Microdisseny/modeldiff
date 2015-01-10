@@ -127,9 +127,7 @@ class SaveModeldiffMixin(models.Model):
         if diff.model_id is None and self.pk:
             diff.model_id = self.pk
             diff.save()
-
-        if hasattr(self.Modeldiff, 'parent_field'):
-            getattr(self, self.Modeldiff.parent_field).save()      
+    
         
     def delete(self, *args, **kwargs):
         real = kwargs.get('real', False)
