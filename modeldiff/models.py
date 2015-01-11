@@ -73,7 +73,8 @@ class SaveModeldiffMixin(models.Model):
             # compare original and current (self)
             old_values = {}
             new_values = {}
-            old_values_temp = model_to_dict(original, fields=self.Modeldiff.fields)
+            old_values_temp = model_to_dict(original, 
+                                            fields=self.Modeldiff.fields)
             new_values_temp = model_to_dict(self, fields=self.Modeldiff.fields)
             
             for k in fields:
@@ -127,7 +128,9 @@ class SaveModeldiffMixin(models.Model):
         if diff.model_id is None and self.pk:
             diff.model_id = self.pk
             diff.save()
-    
+
+        if hasattr(self.Modeldiff, 'parent_field'):
+            getattr(self, self.Modeldiff.parent_field).save()      
         
     def delete(self, *args, **kwargs):
         real = kwargs.get('real', False)
@@ -173,6 +176,9 @@ class SaveModeldiffMixin(models.Model):
             diff.save()
 
         super(SaveModeldiffMixin, self).delete(*args, **kwargs)
+        
+        if hasattr(self.Modeldiff, 'parent_field'):
+            getattr(self, self.Modeldiff.parent_field).save()
         
     class Meta:
         abstract = True
@@ -291,6 +297,9 @@ class SaveGeomodeldiffMixin(models.Model):
             diff.model_id = self.pk
             diff.save()
 
+        if hasattr(self.Modeldiff, 'parent_field'):
+            getattr(self, self.Modeldiff.parent_field).save()
+            
     def delete(self, *args, **kwargs):
         real = kwargs.get('real', False)
 
@@ -345,6 +354,9 @@ class SaveGeomodeldiffMixin(models.Model):
             diff.save()
 
         super(SaveGeomodeldiffMixin, self).delete(*args, **kwargs)
+        
+        if hasattr(self.Modeldiff, 'parent_field'):
+            getattr(self, self.Modeldiff.parent_field).save()
 
     class Meta:
         abstract = True
