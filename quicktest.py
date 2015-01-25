@@ -11,21 +11,22 @@ class QuickDjangoTest(object):
 
     Example usage:
 
-        >>> QuickDjangoTest('app1', 'app2')
+        >>> QuickDjangoTest(apps=['app1', 'app2'], db='sqlite')
 
     Based on a script published by Lukasz Dziedzia at:
     http://stackoverflow.com/questions/3841725/how-to-launch-tests-for-django-reusable-app
     """
     DIRNAME = os.path.dirname(__file__)
-    INSTALLED_APPS = (
+    INSTALLED_APPS = [
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.admin',
-    )
+    ]
 
     def __init__(self, *args, **kwargs):
-        self.apps = args
+        self.apps = kwargs.get('apps', [])
+        self.database= kwargs.get('db', 'sqlite')
         self.version = self.get_test_version()
         self.run_tests()
 
@@ -45,17 +46,27 @@ class QuickDjangoTest(object):
         """
         Fire up the Django test suite developed for version 1.2
         """
-        settings.configure(
-            DATABASES={
+        if self.database == 'postgres':
+            databases = {
                 'default': {
-                    'ENGINE': 'django.contrib.gis.db.backends.spatialite',
-                    'NAME': os.path.join(self.DIRNAME, 'database.db'),
-                    'USER': '',
-                    'PASSWORD': '',
-                    'HOST': '',
-                    'PORT': '',
+                    'ENGINE': 'django.contrib.gis.db.backends.postgis',
+                    'NAME': 'modeldiff_test',
+                    'HOST': '127.0.0.1',
+                    'USER': 'admin',
+                    'PASSWORD': 'p1234',
                 }
-            },
+            }
+
+        else:
+            databases = {
+                'default': {
+                     'ENGINE': 'django.contrib.gis.db.backends.spatialite',
+                     'NAME': os.path.join(self.DIRNAME, 'database.db'),
+                }
+            }
+        settings.configure(
+            DATABASES=databases,
+            MIDDLEWARE_CLASSES=(),
             INSTALLED_APPS=self.INSTALLED_APPS + self.apps,
             USE_TZ=True,
         )
@@ -73,13 +84,14 @@ if __name__ == '__main__':
 
     Example usage:
 
-        $ python quicktest.py app1 app2
+        $ python quicktest.py app1 app2 --db=sqlite
 
     """
     parser = argparse.ArgumentParser(
-        usage="[args]",
+        usage="[args] [--db=sqlite]",
         description="Run Django tests on the provided applications."
     )
     parser.add_argument('apps', nargs='+', type=str)
+    parser.add_argument('--db', nargs='?', type=str, default='sqlite')
     args = parser.parse_args()
-    QuickDjangoTest(*args.apps)
+    QuickDjangoTest(apps=args.apps, db=args.db)
