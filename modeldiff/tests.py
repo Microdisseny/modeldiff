@@ -52,7 +52,7 @@ class ModeldiffTests(TestCase):
         print >> sys.stderr, '  ---------'
 
     def test_creation_diff_exists(self):
-        diff = Modeldiff.objects.all().order_by('-id')[0]
+        diff = Modeldiff.objects.all().order_by('-id')[:1][0]
         self.assertEqual(diff.id, 1)
         self.assertEqual(diff.action, 'add')
         self.assertEqual(diff.model_id, self.person.id)
@@ -72,7 +72,7 @@ class ModeldiffTests(TestCase):
         self.person.updated_at = datetime(2015, 1, 7, 23, 12, 11, 292032, GMT0())
         self.person.save()
   
-        diff = Modeldiff.objects.all().order_by('-id')[0]
+        diff = Modeldiff.objects.all().order_by('-id')[:1][0]
 
         self.assertEqual(diff.action, 'update')
         self.assertEqual(diff.model_id, self.person.id)
@@ -90,7 +90,7 @@ class ModeldiffTests(TestCase):
         self.person.updated_at = datetime(2015, 1, 7, 23, 39, 13, 292032, GMT0())
         self.person.save()
           
-        diff = Modeldiff.objects.all().order_by('-id')[0]
+        diff = Modeldiff.objects.all().order_by('-id')[:1][0]
         
         self.assertEqual(diff.action, 'update')
         self.assertEqual(diff.model_id, self.person.id)
@@ -108,7 +108,7 @@ class ModeldiffTests(TestCase):
         person_id = self.person.id
         self.person.delete()
     
-        diff = Modeldiff.objects.all().order_by('-id')[0]
+        diff = Modeldiff.objects.all().order_by('-id')[:1][0]
         self.assertEqual(diff.action, 'delete')
         self.assertEqual(diff.model_id, person_id)
         self.assertEqual(json.loads(diff.old_data),
@@ -122,7 +122,7 @@ class ModeldiffTests(TestCase):
         self.person.surname = None
         self.person.save()
     
-        diff = Modeldiff.objects.all().order_by('-id')[0]
+        diff = Modeldiff.objects.all().order_by('-id')[:1][0]
         self.assertEqual(diff.action, 'update')
         self.assertEqual(diff.model_id, self.person.id)
         self.assertEqual(json.loads(diff.old_data),
@@ -168,7 +168,7 @@ class ModeldiffTests(TestCase):
     #Geo tests
     def test_geo_creation_diff_exists(self):
 
-        diff = Geomodeldiff.objects.all().order_by('-id')[0]
+        diff = Geomodeldiff.objects.all().order_by('-id')[:1][0]
 
         self.assertEqual(diff.action, 'add')
         self.assertEqual(diff.model_id, self.persongeo.id)
@@ -191,7 +191,7 @@ class ModeldiffTests(TestCase):
         self.persongeo.updated_at = datetime(2015, 1, 7, 23, 12, 11, 292032, GMT0())
         self.persongeo.save()
 
-        diff = Geomodeldiff.objects.all().order_by('-id')[0]
+        diff = Geomodeldiff.objects.all().order_by('-id')[:1][0]
         self.assertEqual(diff.action, 'update')
         self.assertEqual(diff.model_id, self.persongeo.id)
         self.assertEqual(json.loads(diff.old_data),
@@ -209,7 +209,7 @@ class ModeldiffTests(TestCase):
         self.persongeo.updated_at = datetime(2015, 1, 7, 23, 39, 13, 292032, GMT0())
         self.persongeo.save()
     
-        diff = Geomodeldiff.objects.all().order_by('-id')[0]
+        diff = Geomodeldiff.objects.all().order_by('-id')[:1][0]
         self.assertEqual(diff.action, 'update')
         self.assertEqual(diff.model_id, self.persongeo.id)
         self.assertEqual(json.loads(diff.old_data),
@@ -227,7 +227,7 @@ class ModeldiffTests(TestCase):
         persongeo_id = self.persongeo.id
         self.persongeo.delete()
      
-        diff = Geomodeldiff.objects.all().order_by('-id')[0]
+        diff = Geomodeldiff.objects.all().order_by('-id')[:1][0]
         self.assertEqual(diff.action, 'delete')
         self.assertEqual(diff.model_id, persongeo_id)
         self.assertEqual(json.loads(diff.old_data),
@@ -243,7 +243,7 @@ class ModeldiffTests(TestCase):
         self.persongeo.the_geom = None
         self.persongeo.save()
      
-        diff = Geomodeldiff.objects.all().order_by('-id')[0]
+        diff = Geomodeldiff.objects.all().order_by('-id')[:1][0]
         self.assertEqual(diff.action, 'update')
         self.assertEqual(diff.model_id, self.persongeo.id)
         self.assertEqual(json.loads(diff.old_data),
@@ -259,7 +259,7 @@ class ModeldiffTests(TestCase):
         person_property = PersonPropertyForGeoModel.objects.create(
             person=self.persongeo, address="Carme 15, Girona")
        
-        diff = Geomodeldiff.objects.all().order_by('-id')[0]
+        diff = Geomodeldiff.objects.all().order_by('-id')[:1][0]
             
         self.assertEqual(diff.action, 'update')
         self.assertEqual(diff.model_name, 'modeldiff.PersonGeoModel')
@@ -267,7 +267,7 @@ class ModeldiffTests(TestCase):
           
         self.assertEqual(diff.new_data, '{}')
         
-        diff = Modeldiff.objects.all().order_by('-id')[0]
+        diff = Modeldiff.objects.all().order_by('-id')[:1][0]
         self.assertEqual(diff.action, 'add')
         self.assertEqual(diff.model_name, 'modeldiff.PersonPropertyForGeoModel')
         self.assertEqual(diff.model_id, person_property.id)
@@ -281,7 +281,7 @@ class ModeldiffTests(TestCase):
         person_property_id = person_property.id
         person_property.delete()
               
-        diff = Geomodeldiff.objects.all().order_by('-id')[0]
+        diff = Geomodeldiff.objects.all().order_by('-id')[:1][0]
            
         self.assertEqual(diff.action, 'update')
         self.assertEqual(diff.model_name, 'modeldiff.PersonGeoModel')
@@ -289,7 +289,7 @@ class ModeldiffTests(TestCase):
         
         self.assertEqual(diff.new_data, '{}')
         
-        diff = Modeldiff.objects.all().order_by('-id')[0]
+        diff = Modeldiff.objects.all().order_by('-id')[:1][0]
         self.assertEqual(diff.action, 'delete')
         self.assertEqual(diff.model_name, 'modeldiff.PersonPropertyForGeoModel')
         self.assertEqual(diff.model_id, person_property_id)
