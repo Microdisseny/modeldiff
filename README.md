@@ -25,3 +25,10 @@ class Pizza(SaveGeomodeldiffMixin, models.Model):
         geom_field = 'latlon'
         geom_precision = 8
 ````
+
+Test
+-----
+
+For sqlite run "python quicktest.py modeldiff"
+
+For postgres run "python quicktest.py modeldiff --db postgres"
