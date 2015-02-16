@@ -1,6 +1,7 @@
 from django.contrib.gis.db import models
 from django.forms.models import model_to_dict
 from django.contrib.gis.utils.wkt import precision_wkt
+from django.conf import settings
 
 from modeldiff.request import GlobalRequest
 
@@ -56,11 +57,12 @@ class SaveModeldiffMixin(models.Model):
 
         diff = Modeldiff()
         diff.model_name = self.Modeldiff.model_name
+        diff.key = settings.MODELDIFF_KEY
         if hasattr(self, 'username'):
             diff.username = self.username
         else:
             try:
-                user = GlobalRequest().user.username
+                diff.username = GlobalRequest().user.username
             except:
                 pass
 
@@ -148,6 +150,11 @@ class SaveModeldiffMixin(models.Model):
         diff.model_name = self.Modeldiff.model_name
         if hasattr(self, 'username'):
             diff.username = self.username
+        else:
+            try:
+                diff.username = GlobalRequest().user.username
+            except:
+                pass
 
         if self.pk:
             diff.model_id = self.pk
@@ -206,14 +213,26 @@ class SaveGeomodeldiffMixin(models.Model):
 
         diff = Geomodeldiff()
         diff.model_name = self.Modeldiff.model_name
+        diff.key = settings.MODELDIFF_KEY
         if hasattr(self, 'username'):
             diff.username = self.username
+        else:
+            try:
+                diff.username = GlobalRequest().user.username
+            except:
+                pass
+
 
         if self.pk:
+            # get original object in database
+            try:
+                original = self.__class__.objects.get(pk=self.pk)
+            except:
+                original = None
+
+        if original:
             diff.model_id = self.pk
             diff.action = 'update'
-            # get original object in database
-            original = self.__class__.objects.get(pk=self.pk)
 
             # compare original and current (self)
             old_values = {}
@@ -317,6 +336,11 @@ class SaveGeomodeldiffMixin(models.Model):
         diff.model_name = self.Modeldiff.model_name
         if hasattr(self, 'username'):
             diff.username = self.username
+        else:
+            try:
+                diff.username = GlobalRequest().user.username
+            except:
+                pass
 
         if self.pk:
             diff.model_id = self.pk
