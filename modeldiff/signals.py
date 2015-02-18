@@ -1,62 +1,88 @@
-from django.db.models.signals import post_delete
+from django.db.models.signals import pre_save, pre_delete
 from django.dispatch.dispatcher import receiver
+from django.forms.models import model_to_dict
+from django.contrib.gis.utils.wkt import precision_wkt
+from django.conf import settings
 
-from modeldiff.models import Geomodeldiff
+from modeldiff.models import Modeldiff, Geomodeldiff
+from modeldiff.request import GlobalRequest
+
+import datetime
+import json
 
 
-def register(model):
-    post_delete.connect(geomodeldiff_post_delete, model)
+class ModeldiffManager(object):
+    def register_modeldiff(self, model):
+        pre_delete.connect(self.modeldiff_pre_delete, model)
 
+    def register_geomodeldiff(self, model):
+        pre_delete.connect(self.geomodeldiff_pre_delete, model)
 
-def geomodeldiff_post_delete(sender, **kwargs):
-    instance = kwargs['instance']
+    def modeldiff_pre_delete(self, sender, **kwargs):
+        self._pre_delete(Modeldiff, sender, **kwargs)
 
-    self = instance
-    fields = self.Modeldiff.fields
-    geom_field = self.Modeldiff.geom_field
-    geom_precision = self.Modeldiff.geom_precision
+    def geomodeldiff_pre_delete(self, sender, **kwargs):
+        self._pre_delete(Geomodeldiff, sender, **kwargs)
 
-    diff = Geomodeldiff()
-    diff.model_name = self.Modeldiff.model_name
-    if hasattr(self, 'username'):
-        diff.username = self.username
-    else:
-        try:
-            diff.username = GlobalRequest().user.username
-        except:
-            pass
+    def _pre_delete(self, modeldiff_class, sender, **kwargs):
+        instance = kwargs['instance']
+        fields = sender.Modeldiff.fields
 
-    diff.model_id = self.pk
-    diff.action = 'delete'
+        diff = modeldiff_class()
+        diff.model_name = sender.Modeldiff.model_name
+        diff.key = settings.MODELDIFF_KEY
+        diff.username = self._get_username(instance)
 
-    # save old values
-    old_values_temp = model_to_dict(self, 
-                                    fields=self.Modeldiff.fields)
-    old_values = {}
+        diff.model_id = instance.pk
+        diff.action = 'delete'
 
-    for k in fields:
-        old_value = old_values_temp[k]
+        # get original object in database
+        original = sender.objects.get(pk=instance.pk)
+
+        # save old values
+        old_values_temp = model_to_dict(original, 
+                                        fields=sender.Modeldiff.fields)
+        old_values = {}
         
-        #Override DateField and DateTimeField
-        if isinstance(old_value, datetime.datetime):
-            old_value = old_value.strftime("%Y-%m-%d %H:%M:%S.%f%z")
+        for k in fields:
+            old_value = old_values_temp[k]
+            
+            #Override DateField and DateTimeField
+            if isinstance(old_value, datetime.datetime):
+                old_value = old_value.strftime("%Y-%m-%d %H:%M:%S.%f%z")
+            else:
+                if isinstance(old_value, datetime.date):
+                    old_value = old_value.strftime("%Y-%m-%d")        
+                    
+            old_values[k] = old_value
+
+
+        if modeldiff_class == Geomodeldiff:
+            geom_field = sender.Modeldiff.geom_field
+            geom_precision = sender.Modeldiff.geom_precision
+
+            # save geometry
+            geom = getattr(instance, geom_field)
+            diff.the_geom = geom
+            if geom:
+                old_values[geom_field] = precision_wkt(geom, geom_precision)
+            else:
+                old_values[geom_field] = None
+
+        diff.old_data = json.dumps(old_values)
+        diff.save()
+
+        if hasattr(sender.Modeldiff, 'parent_field'):
+            getattr(instance, sender.Modeldiff.parent_field).save()
+
+    def _get_username(self, instance):
+        if hasattr(instance, 'username'):
+            return instance.username
         else:
-            if isinstance(old_value, datetime.date):
-                old_value = old_value.strftime("%Y-%m-%d")       
-                
-        old_values[k] = old_value
-        
+            try:
+                return GlobalRequest().user.username
+            except:
+                return ''
 
-    # save geometry
-    geom = getattr(self, geom_field)
-    diff.the_geom = geom
-    if geom:
-        old_values[geom_field] = precision_wkt(geom, geom_precision)
-    else:
-        old_values[geom_field] = None
 
-    diff.old_data = json.dumps(old_values)
-    diff.save()
-    
-    if hasattr(self.Modeldiff, 'parent_field'):
-        getattr(self, self.Modeldiff.parent_field).save()
+modeldiff_manager = ModeldiffManager()
