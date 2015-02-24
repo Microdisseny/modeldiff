@@ -16,7 +16,7 @@ class ModeldiffMixin(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     key = models.CharField(max_length=20, blank=True, null=True)
     key_id = models.IntegerField(blank=True, null=True)
-    username = models.CharField(max_length=50)
+    username = models.CharField(max_length=50, blank=True, default='')
     model_name = models.CharField(max_length=50)
     model_id = models.IntegerField(blank=True, null=True)
     action = models.CharField(max_length=6)
@@ -133,8 +133,9 @@ class SaveModeldiffMixin(models.Model):
 
         if hasattr(self.Modeldiff, 'parent_field'):
             getattr(self, self.Modeldiff.parent_field).save()      
-        
-    def delete(self, *args, **kwargs):
+
+    # this is best handled using signals
+    def delete_deprecated(self, *args, **kwargs):
         real = kwargs.get('real', False)
 
         if real:
@@ -223,12 +224,13 @@ class SaveGeomodeldiffMixin(models.Model):
                 pass
 
 
+        original = None
         if self.pk:
             # get original object in database
             try:
                 original = self.__class__.objects.get(pk=self.pk)
             except:
-                original = None
+                pass
 
         if original:
             diff.model_id = self.pk
@@ -318,8 +320,9 @@ class SaveGeomodeldiffMixin(models.Model):
 
         if hasattr(self.Modeldiff, 'parent_field'):
             getattr(self, self.Modeldiff.parent_field).save()
-            
-    def delete(self, *args, **kwargs):
+
+    # this is best handled using signals
+    def delete_deprecated(self, *args, **kwargs):
         real = kwargs.get('real', False)
 
         if real:
