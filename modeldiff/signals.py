@@ -36,6 +36,10 @@ class ModeldiffManager(object):
         diff.model_id = instance.pk
         diff.action = 'delete'
 
+        unique_field = getattr(self.Modeldiff, 'unique_field', None)
+        if unique_field:
+            diff.unique_id = getattr(self, unique_field)
+
         # get original object in database
         original = sender.objects.get(pk=instance.pk)
 

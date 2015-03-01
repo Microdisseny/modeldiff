@@ -14,15 +14,18 @@ class ModeldiffMixin(models.Model):
     Base model to save the changes to a model
     """
     date_created = models.DateTimeField(auto_now_add=True)
-    key = models.CharField(max_length=20, blank=True, null=True)
-    key_id = models.IntegerField(blank=True, null=True)
-    username = models.CharField(max_length=50, blank=True, default='')
+    # optional key identifying the source
+    key = models.CharField(max_length=20, blank=True, default='',
+                           db_index=True)
+    username = models.CharField(max_length=50, default='', blank=True)
     model_name = models.CharField(max_length=50)
     model_id = models.IntegerField(blank=True, null=True)
+    # model unique identifier
+    unique_id = models.CharField(max_length=50, default='', blank=True)
     action = models.CharField(max_length=6)
     old_data = models.TextField()
     new_data = models.TextField()
-    applied = models.BooleanField(default=False)
+    applied = models.BooleanField(default=False, db_index=True)
 
     class Meta:
         abstract = True
@@ -65,6 +68,10 @@ class SaveModeldiffMixin(models.Model):
                 diff.username = GlobalRequest().user.username
             except:
                 pass
+
+        unique_field = getattr(self.Modeldiff, 'unique_field', None)
+        if unique_field:
+            diff.unique_id = getattr(self, unique_field)
 
         if self.pk:
             diff.model_id = self.pk
@@ -223,6 +230,9 @@ class SaveGeomodeldiffMixin(models.Model):
             except:
                 pass
 
+        unique_field = getattr(self.Modeldiff, 'unique_field', None)
+        if unique_field:
+            diff.unique_id = getattr(self, unique_field)
 
         original = None
         if self.pk:
