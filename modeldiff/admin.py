@@ -44,7 +44,7 @@ class GeomodeldiffAdminListFilter(ModeldiffAdminListFilter):
    
 
 class ModeldiffAdmin(gis_admin.ModelAdmin):
-    list_display = ('date_created', 'key', 'username', 'model_name',
+    list_display = ('date_created', 'key', 'key_id', 'username', 'model_name',
                     'model_id', 'unique_id', 'action', 'applied')
     search_fields = ('username', 'model_name', '=model_id',)
     list_filter = (ModeldiffAdminListFilter,)
@@ -53,7 +53,7 @@ gis_admin.site.register(Modeldiff, ModeldiffAdmin)
  
  
 class GeomodeldiffAdmin(LeafletGeoAdmin):
-    list_display = ('date_created', 'key', 'username', 'model_name',
+    list_display = ('date_created', 'key', 'key_id', 'username', 'model_name',
                     'model_id', 'unique_id', 'action', 'applied')
     search_fields = ('username', 'model_name', '=model_id',)
     list_filter = (GeomodeldiffAdminListFilter,)
