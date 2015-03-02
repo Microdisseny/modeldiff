@@ -17,6 +17,7 @@ class ModeldiffMixin(models.Model):
     # optional key identifying the source
     key = models.CharField(max_length=20, blank=True, default='',
                            db_index=True)
+    key_id = models.IntegerField(blank=True, null=True)
     username = models.CharField(max_length=50, default='', blank=True)
     model_name = models.CharField(max_length=50)
     model_id = models.IntegerField(blank=True, null=True)
