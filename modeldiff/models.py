@@ -48,11 +48,11 @@ class SaveModeldiffMixin(models.Model):
     def save(self, *args, **kwargs):
         # see if we need to save the object (real = True)
         # or should generate a Modeldiff (real = False)
-        real = kwargs.get('real', False)
+        ignore = kwargs.get('modeldiff_ignore', False)
 
-        if real:
+        if ignore:
             # call original handler
-            kwargs.pop('real')
+            kwargs.pop('modeldiff_ignore')
             super(SaveModeldiffMixin, self).save(*args, **kwargs)
             return
 
@@ -207,11 +207,11 @@ class SaveGeomodeldiffMixin(models.Model):
     def save(self, *args, **kwargs):
         # see if we need to save the object (real = True)
         # or should generate a Modeldiff (real = False)
-        real = kwargs.get('real', False)
+        ignore = kwargs.get('modeldiff_ignore', False)
 
-        if real:
+        if ignore:
             # call original handler
-            kwargs.pop('real')
+            kwargs.pop('modeldiff_ignore')
             super(SaveGeomodeldiffMixin, self).save(*args, **kwargs)
             return
 
