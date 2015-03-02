@@ -13,7 +13,7 @@ class ModeldiffMixin(models.Model):
     """
     Base model to save the changes to a model
     """
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(default=datetime.datetime.now)
     # optional key identifying the source
     key = models.CharField(max_length=20, blank=True, default='',
                            db_index=True)
