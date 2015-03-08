@@ -1,6 +1,7 @@
 from django.contrib.gis.db import models
 from django.forms.models import model_to_dict
 from django.contrib.gis.utils.wkt import precision_wkt
+from django.utils import timezone
 from django.conf import settings
 
 from modeldiff.request import GlobalRequest
@@ -13,7 +14,7 @@ class ModeldiffMixin(models.Model):
     """
     Base model to save the changes to a model
     """
-    date_created = models.DateTimeField(default=datetime.datetime.now)
+    date_created = models.DateTimeField(default=timezone.now)
     # optional key identifying the source
     key = models.CharField(max_length=20, blank=True, default='',
                            db_index=True)
