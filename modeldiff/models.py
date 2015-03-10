@@ -61,6 +61,7 @@ class SaveModeldiffMixin(models.Model):
         fields = self.Modeldiff.fields
 
         diff = Modeldiff()
+        diff.applied = True
         diff.model_name = self.Modeldiff.model_name
         diff.key = settings.MODELDIFF_KEY
         if hasattr(self, 'username'):
