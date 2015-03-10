@@ -223,6 +223,7 @@ class SaveGeomodeldiffMixin(models.Model):
         geom_precision = self.Modeldiff.geom_precision
 
         diff = Geomodeldiff()
+        diff.applied = True
         diff.model_name = self.Modeldiff.model_name
         diff.key = settings.MODELDIFF_KEY
         if hasattr(self, 'username'):
