@@ -26,6 +26,12 @@ class ModeldiffManager(object):
 
     def _pre_delete(self, modeldiff_class, sender, **kwargs):
         instance = kwargs['instance']
+
+        # see if we need to create a modeldiff to track the object deletion
+        if hasattr(instance, '_modeldiff_ignore'):
+            del instance._modeldiff_ignore
+            return
+
         fields = sender.Modeldiff.fields
 
         diff = modeldiff_class()
