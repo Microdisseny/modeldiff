@@ -35,6 +35,7 @@ class ModeldiffManager(object):
         fields = sender.Modeldiff.fields
 
         diff = modeldiff_class()
+        diff.applied = True
         diff.model_name = sender.Modeldiff.model_name
         diff.key = settings.MODELDIFF_KEY
         diff.username = self._get_username(instance)
