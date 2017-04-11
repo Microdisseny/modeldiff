@@ -22,6 +22,7 @@ install:
   - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then pip install --global-option=build_ext --global-option='-USQLITE_OMIT_LOAD_EXTENSION' pysqlite; fi
   - CFLAGS=-I/usr/include/gdal pip install GDAL==1.10
   - pip install -q $DJANGO
+  - pip install django-leaflet
 
 script:
   - python -Wall tests/manage.py test test_core --settings=settings

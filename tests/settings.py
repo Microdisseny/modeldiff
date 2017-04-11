@@ -24,4 +24,6 @@ DATABASES = {
     }
 }
 
+MIDDLEWARE_CLASSES = []
+
 MODELDIFF_KEY = 'core'
