@@ -13,7 +13,6 @@ addons:
         - spatialite-bin
         - libsqlite3-0
         - libspatialite3
-        - libsqlite3-mod-spatialite
 
 env:
   - DJANGO="Django>=1.6,<1.7"
