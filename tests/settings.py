@@ -15,7 +15,7 @@ INSTALLED_APPS = [
 
 USE_TZ = True
 
-SPATIALITE_LIBRARY_PATH = 'mod_spatialite'
+# SPATIALITE_LIBRARY_PATH = 'mod_spatialite'
 
 DATABASES = {
     'default': {
