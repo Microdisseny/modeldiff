@@ -3,7 +3,8 @@ python:
   - "2.7"
 env:
   - DJANGO="Django>=1.6,<1.7"
+  - DJANGO_SETTINGS_MODULE=settings
 install:
   - pip install -q $DJANGO
 script:
-  - python -Wall tests/manage.py test test_core --settings=
+  - python -Wall tests/manage.py test test_core
