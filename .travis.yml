@@ -5,3 +5,5 @@ env:
   - DJANGO="Django>=1.6,<1.7"
 install:
   - pip install -q $DJANGO
+script:
+  - python -Wall tests/manage.py test test_core --settings=
