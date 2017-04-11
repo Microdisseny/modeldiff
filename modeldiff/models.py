@@ -85,29 +85,29 @@ class SaveModeldiffMixin(models.Model):
             # compare original and current (self)
             old_values = {}
             new_values = {}
-            old_values_temp = model_to_dict(original, 
+            old_values_temp = model_to_dict(original,
                                             fields=self.Modeldiff.fields)
             new_values_temp = model_to_dict(self, fields=self.Modeldiff.fields)
-            
+
             for k in fields:
                 old_value = old_values_temp[k]
                 new_value = new_values_temp[k]
-                
-                #Override DateField and DateTimeField
+
+                # Override DateField and DateTimeField
                 if isinstance(new_value, datetime.datetime):
                     new_value = new_value.strftime("%Y-%m-%d %H:%M:%S.%f%z")
                 else:
                     if isinstance(new_value, datetime.date):
                         new_value = new_value.strftime("%Y-%m-%d")
-                
+
                 if isinstance(old_value, datetime.datetime):
                     old_value = old_value.strftime("%Y-%m-%d %H:%M:%S.%f%z")
                 else:
                     if isinstance(old_value, datetime.date):
                         old_value = old_value.strftime("%Y-%m-%d")
-                
+
                 old_values[k] = old_value
-                
+
                 if old_value != new_value:
                     new_values[k] = new_value
 
@@ -120,19 +120,19 @@ class SaveModeldiffMixin(models.Model):
 
             new_values_temp = model_to_dict(self, fields=self.Modeldiff.fields)
             new_values = {}
-            
+
             for k in fields:
                 new_value = new_values_temp[k]
-                
-                #Override DateField and DateTimeField
+
+                # Override DateField and DateTimeField
                 if isinstance(new_value, datetime.datetime):
                     new_value = new_value.strftime("%Y-%m-%d %H:%M:%S.%f%z")
                 else:
                     if isinstance(new_value, datetime.date):
-                        new_value = new_value.strftime("%Y-%m-%d")       
-                        
+                        new_value = new_value.strftime("%Y-%m-%d")
+
                 new_values[k] = new_value
-                
+
             diff.new_data = json.dumps(new_values)
             diff.save()
 
@@ -142,10 +142,10 @@ class SaveModeldiffMixin(models.Model):
             diff.save()
 
         if hasattr(self.Modeldiff, 'parent_field'):
-            getattr(self, self.Modeldiff.parent_field).save()      
+            getattr(self, self.Modeldiff.parent_field).save()
 
     # this is best handled using signals
-    def delete_deprecated(self, *args, **kwargs):
+    def delete_deprecated(self, *args, **kwargs):  # pragma: no cover
         real = kwargs.get('real', False)
 
         if real:
@@ -155,7 +155,6 @@ class SaveModeldiffMixin(models.Model):
             return
 
         fields = self.Modeldiff.fields
-
 
         diff = Modeldiff()
         diff.model_name = self.Modeldiff.model_name
@@ -174,30 +173,30 @@ class SaveModeldiffMixin(models.Model):
             original = self.__class__.objects.get(pk=self.pk)
 
             # save old values
-            old_values_temp = model_to_dict(original, 
+            old_values_temp = model_to_dict(original,
                                             fields=self.Modeldiff.fields)
             old_values = {}
-            
+
             for k in fields:
                 old_value = old_values_temp[k]
-                
-                #Override DateField and DateTimeField
+
+                # Override DateField and DateTimeField
                 if isinstance(old_value, datetime.datetime):
                     old_value = old_value.strftime("%Y-%m-%d %H:%M:%S.%f%z")
                 else:
                     if isinstance(old_value, datetime.date):
-                        old_value = old_value.strftime("%Y-%m-%d")        
-                        
+                        old_value = old_value.strftime("%Y-%m-%d")
+
                 old_values[k] = old_value
 
             diff.old_data = json.dumps(old_values)
             diff.save()
 
         super(SaveModeldiffMixin, self).delete(*args, **kwargs)
-        
+
         if hasattr(self.Modeldiff, 'parent_field'):
             getattr(self, self.Modeldiff.parent_field).save()
-        
+
     class Meta:
         abstract = True
 
@@ -253,31 +252,30 @@ class SaveGeomodeldiffMixin(models.Model):
             # compare original and current (self)
             old_values = {}
             new_values = {}
-            old_values_temp = model_to_dict(original, 
+            old_values_temp = model_to_dict(original,
                                             fields=self.Modeldiff.fields)
-            new_values_temp = model_to_dict(self, 
+            new_values_temp = model_to_dict(self,
                                             fields=self.Modeldiff.fields)
-            
-           
+
             for k in fields:
                 old_value = old_values_temp[k]
                 new_value = new_values_temp[k]
-                
-                #Override DateField and DateTimeField
+
+                # Override DateField and DateTimeField
                 if isinstance(new_value, datetime.datetime):
                     new_value = new_value.strftime("%Y-%m-%d %H:%M:%S.%f%z")
                 else:
                     if isinstance(new_value, datetime.date):
                         new_value = new_value.strftime("%Y-%m-%d")
-                
+
                 if isinstance(old_value, datetime.datetime):
                     old_value = old_value.strftime("%Y-%m-%d %H:%M:%S.%f%z")
                 else:
                     if isinstance(old_value, datetime.date):
                         old_value = old_value.strftime("%Y-%m-%d")
-                
+
                 old_values[k] = old_value
-                
+
                 if old_value != new_value:
                     new_values[k] = new_value
 
@@ -307,16 +305,16 @@ class SaveGeomodeldiffMixin(models.Model):
             # save all new values
             new_values_temp = model_to_dict(self, fields=self.Modeldiff.fields)
             new_values = {}
-            
+
             for k in fields:
                 new_value = new_values_temp[k]
-                #Override DateField and DateTimeField
+                # Override DateField and DateTimeField
                 if isinstance(new_value, datetime.datetime):
                     new_value = new_value.strftime("%Y-%m-%d %H:%M:%S.%f%z")
                 else:
                     if isinstance(new_value, datetime.date):
                         new_value = new_value.strftime("%Y-%m-%d")
-                        
+
                 new_values[k] = new_value
 
             new_geom = getattr(self, geom_field)
@@ -336,7 +334,7 @@ class SaveGeomodeldiffMixin(models.Model):
             getattr(self, self.Modeldiff.parent_field).save()
 
     # this is best handled using signals
-    def delete_deprecated(self, *args, **kwargs):
+    def delete_deprecated(self, *args, **kwargs):  # pragma: no cover
         real = kwargs.get('real', False)
 
         if real:
@@ -366,22 +364,21 @@ class SaveGeomodeldiffMixin(models.Model):
             original = self.__class__.objects.get(pk=self.pk)
 
             # save old values
-            old_values_temp = model_to_dict(original, 
+            old_values_temp = model_to_dict(original,
                                             fields=self.Modeldiff.fields)
             old_values = {}
-            
+
             for k in fields:
                 old_value = old_values_temp[k]
-                
-                #Override DateField and DateTimeField
+
+                # Override DateField and DateTimeField
                 if isinstance(old_value, datetime.datetime):
                     old_value = old_value.strftime("%Y-%m-%d %H:%M:%S.%f%z")
                 else:
                     if isinstance(old_value, datetime.date):
-                        old_value = old_value.strftime("%Y-%m-%d")       
-                        
+                        old_value = old_value.strftime("%Y-%m-%d")
+
                 old_values[k] = old_value
-                
 
             # save geometry
             geom = getattr(self, geom_field)
@@ -395,7 +392,7 @@ class SaveGeomodeldiffMixin(models.Model):
             diff.save()
 
         super(SaveGeomodeldiffMixin, self).delete(*args, **kwargs)
-        
+
         if hasattr(self.Modeldiff, 'parent_field'):
             getattr(self, self.Modeldiff.parent_field).save()
 

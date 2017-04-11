@@ -1,1 +1,0 @@
-python quicktest.py modeldiff

@@ -1,5 +1,4 @@
-from django.db.models.signals import pre_save, pre_delete
-from django.dispatch.dispatcher import receiver
+from django.db.models.signals import pre_delete
 from django.forms.models import model_to_dict
 from django.contrib.gis.utils.wkt import precision_wkt
 from django.conf import settings
@@ -51,22 +50,21 @@ class ModeldiffManager(object):
         original = sender.objects.get(pk=instance.pk)
 
         # save old values
-        old_values_temp = model_to_dict(original, 
+        old_values_temp = model_to_dict(original,
                                         fields=sender.Modeldiff.fields)
         old_values = {}
-        
+
         for k in fields:
             old_value = old_values_temp[k]
-            
-            #Override DateField and DateTimeField
+
+            # Override DateField and DateTimeField
             if isinstance(old_value, datetime.datetime):
                 old_value = old_value.strftime("%Y-%m-%d %H:%M:%S.%f%z")
             else:
                 if isinstance(old_value, datetime.date):
-                    old_value = old_value.strftime("%Y-%m-%d")        
-                    
-            old_values[k] = old_value
+                    old_value = old_value.strftime("%Y-%m-%d")
 
+            old_values[k] = old_value
 
         if modeldiff_class == Geomodeldiff:
             geom_field = sender.Modeldiff.geom_field

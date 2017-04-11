@@ -23,6 +23,7 @@ class QuickDjangoTest(object):
         'django.contrib.sessions',
         'django.contrib.admin',
     ]
+    SPATIALITE_LIBRARY_PATH = 'mod_spatialite'
 
     def __init__(self, *args, **kwargs):
         self.apps = kwargs.get('apps', [])
@@ -69,6 +70,8 @@ class QuickDjangoTest(object):
             MIDDLEWARE_CLASSES=(),
             INSTALLED_APPS=self.INSTALLED_APPS + self.apps,
             USE_TZ=True,
+            SPATIALITE_LIBRARY_PATH=self.SPATIALITE_LIBRARY_PATH,
+            MODELDIFF_KEY='default',
         )
         from django.test.simple import DjangoTestSuiteRunner
         if self.version == '1.7':

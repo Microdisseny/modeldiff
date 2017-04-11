@@ -15,6 +15,7 @@ from threading import currentThread
 from django.http import HttpRequest
 from django.contrib.auth.models import AnonymousUser
 
+
 def GlobalRequest():
     t = currentThread()
     if hasattr(t, 'request'):
@@ -27,12 +28,14 @@ def GlobalRequest():
     r = HttpRequest()
     r.user = AnonymousUser()
     return r
+
+
 #
 # I think you should already know how to install a customer middleware...
 # If not, read the official documents
 #
 class GlobalRequestMiddleware(object):
-    def process_request( self, request ):
+    def process_request(self, request):
         t = currentThread()
         t.request = request
 
