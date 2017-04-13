@@ -31,9 +31,13 @@ install:
   - CFLAGS=-I/usr/include/gdal pip install GDAL==1.10
   - pip install -q $DJANGO
   - pip install django-leaflet
+  - pip install coveralls
 
 script:
   - python -Wall tests/manage.py test test_core --settings=settings
+  - coverage run --omit='quicktest.py,setup.py' --source=. tests/manage.py test tests
+
+after_success: coveralls
 
 matrix:
   exclude:
