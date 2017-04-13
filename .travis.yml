@@ -31,6 +31,7 @@ install:
   - CFLAGS=-I/usr/include/gdal pip install GDAL==1.10
   - pip install -q $DJANGO
   - pip install django-leaflet
+  - pip install pytz
   - pip install coveralls
 
 script:
