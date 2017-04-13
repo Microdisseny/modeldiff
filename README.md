@@ -1,6 +1,9 @@
 django modeldiff
 ================
 
+[![Build Status](https://travis-ci.org/manelclos/modeldiff.svg?branch=master)](https://travis-ci.org/manelclos/modeldiff)
+[![Coverage Status](https://coveralls.io/repos/github/manelclos/modeldiff/badge.svg?branch=master)](https://coveralls.io/github/manelclos/modeldiff?branch=master)
+
 When saving a model, store the changes in a modeldiff object so they can be applied elsewhere. Also helps tracking user's modifications
 
 Usage
