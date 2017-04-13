@@ -1,6 +1,6 @@
 from django.contrib.gis import admin as gis_admin
 from django.contrib import admin
-from models import Modeldiff, Geomodeldiff
+from modeldiff.models import Modeldiff, Geomodeldiff
 from leaflet.admin import LeafletGeoAdmin
 
 from django.apps import apps
