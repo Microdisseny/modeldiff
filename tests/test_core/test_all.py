@@ -112,9 +112,6 @@ class ModeldiffTests(TestCase):
         person_id = self.person.id
         self.person.delete()
 
-        for g in Geomodeldiff.objects.all():
-            print g.action
-
         diff = Modeldiff.objects.all().last()
         self.assertEqual(diff.action, 'delete')
         self.assertEqual(diff.model_id, person_id)
