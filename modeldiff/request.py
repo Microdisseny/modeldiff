@@ -35,9 +35,23 @@ def GlobalRequest():
 # If not, read the official documents
 #
 class GlobalRequestMiddleware(object):
-    def process_request(self, request):
+    def __init__(self, get_response):
+        self.get_response = get_response
+        # One-time configuration and initialization.
+
+    def __call__(self, request):
+        # Code to be executed for each request before
+        # the view (and later middleware) are called.
         t = currentThread()
         t.request = request
+
+        response = self.get_response(request)
+
+        # Code to be executed for each request/response after
+        # the view is called.
+        t.request = None
+
+        return response
 
 # use it as:
 # user = GlobalRequest().user
