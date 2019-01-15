@@ -3,6 +3,6 @@
 export DJANGO_SETTINGS_MODULE=settings
 PYTHONPATH=".:tests:$PYTHONPATH"
 coverage run \
-    --omit='quicktest.py,setup.py' \
+    --omit='quicktest.py,setup.py,venv/*' \
     --source=. tests/manage.py test tests
 coverage report -m

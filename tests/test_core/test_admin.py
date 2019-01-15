@@ -1,5 +1,6 @@
-from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.urls import reverse
+
 from helpers import create_superuser
 
 

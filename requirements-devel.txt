@@ -1,6 +1,0 @@
-Django==1.6.6
-flake8==2.2.2
-mccabe==0.2.1
-pep8==1.5.7
-pyflakes==0.8.1
-pysqlite==2.6.3
