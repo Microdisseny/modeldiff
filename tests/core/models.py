@@ -10,8 +10,6 @@ class PersonModel(SaveModeldiffMixin, models.Model):
     birthdate = models.DateField(null=True, blank=True)
     updated_at = models.DateTimeField(null=False, blank=False)
 
-    objects = models.GeoManager()
-
     class Modeldiff:
         model_name = 'modeldiff.PersonModel'
         fields = ('name', 'surname', 'birthdate', 'updated_at')
@@ -24,8 +22,6 @@ class PersonGeoModel(SaveGeomodeldiffMixin, models.Model):
     updated_at = models.DateTimeField(null=False, blank=False)
     the_geom = models.PointField(srid=4326, null=True, blank=True)
 
-    objects = models.GeoManager()
-
     class Modeldiff:
         model_name = 'modeldiff.PersonGeoModel'
         fields = ('name', 'surname', 'birthdate', 'updated_at')
@@ -34,7 +30,7 @@ class PersonGeoModel(SaveGeomodeldiffMixin, models.Model):
 
 
 class PersonPropertyModel(SaveModeldiffMixin, models.Model):
-    person = models.ForeignKey(PersonModel)
+    person = models.ForeignKey(PersonModel, on_delete=models.CASCADE)
     address = models.CharField(max_length=50, null=True, blank=True)
 
     class Modeldiff:
@@ -44,7 +40,7 @@ class PersonPropertyModel(SaveModeldiffMixin, models.Model):
 
 
 class PersonPropertyForGeoModel(SaveModeldiffMixin, models.Model):
-    person = models.ForeignKey(PersonGeoModel)
+    person = models.ForeignKey(PersonGeoModel, on_delete=models.CASCADE)
     address = models.CharField(max_length=50, null=True, blank=True)
 
     class Modeldiff:

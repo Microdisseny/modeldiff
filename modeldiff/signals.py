@@ -1,13 +1,13 @@
-from django.db.models.signals import pre_delete
-from django.forms.models import model_to_dict
-from django.contrib.gis.utils.wkt import precision_wkt
-from django.conf import settings
-
-from modeldiff.models import Modeldiff, Geomodeldiff
-from modeldiff.request import GlobalRequest
-
 import datetime
 import json
+
+from django.conf import settings
+from django.contrib.gis.geos import WKTWriter
+from django.db.models.signals import pre_delete
+from django.forms.models import model_to_dict
+
+from modeldiff.models import Geomodeldiff, Modeldiff
+from modeldiff.request import GlobalRequest
 
 
 class ModeldiffManager(object):
@@ -69,12 +69,12 @@ class ModeldiffManager(object):
         if modeldiff_class == Geomodeldiff:
             geom_field = sender.Modeldiff.geom_field
             geom_precision = sender.Modeldiff.geom_precision
-
+            wkt_w = WKTWriter(precision=geom_precision)
             # save geometry
             geom = getattr(instance, geom_field)
             diff.the_geom = geom
             if geom:
-                old_values[geom_field] = precision_wkt(geom, geom_precision)
+                old_values[geom_field] = wkt_w.write(geom).decode('utf8')
             else:
                 old_values[geom_field] = None
 
@@ -90,7 +90,7 @@ class ModeldiffManager(object):
         else:
             try:
                 return GlobalRequest().user.username
-            except:
+            except Exception:
                 return ''
 
 

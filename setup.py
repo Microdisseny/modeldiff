@@ -3,12 +3,12 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-modeldiff',
-    version='0.1',
+    version='0.2',
     description='Track changes when saving or deleting django model objects',
     long_description=open('README.md').read(),
     author='Manel Clos',
-    author_email='manelclos@gmail.com',
-    url='http://github.com/manelclos/modeldiff',
+    author_email='tech@microdisseny.com',
+    url='git@github.com:Microdisseny/modeldiff',
     license='BSD',
     packages=find_packages(),
     include_package_data=True,
@@ -20,7 +20,7 @@ setup(
         'Framework :: Django',
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
-        'Programming Language :: Python',
+        'Programming Language :: Python 3',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ]
 )

@@ -1,5 +1,5 @@
 from django.test import TestCase
-from django.contrib.gis.utils.wkt import precision_wkt
+from django.contrib.gis.geos import WKTWriter
 from datetime import date, datetime, tzinfo, timedelta
 
 import json
@@ -78,9 +78,9 @@ class ModeldiffTests(TestCase):
         self.assertEqual(diff.action, 'update')
         self.assertEqual(diff.model_id, self.person.id)
         self.assertEqual(json.loads(diff.old_data),
-                         {u'name': u'Foo', u'surname': u'Doe',
-                          u'birthdate': '2007-12-05',
-                          u'updated_at': '2015-01-07 22:00:10.292032+0000'})
+                         {'name': 'Foo', 'surname': 'Doe',
+                          'birthdate': '2007-12-05',
+                          'updated_at': '2015-01-07 22:00:10.292032+0000'})
         self.assertEqual(json.loads(diff.new_data),
                          {'name': 'Bar',
                           'birthdate': '2010-10-01',
@@ -99,8 +99,8 @@ class ModeldiffTests(TestCase):
         self.assertEqual(diff.model_id, self.person.id)
         self.assertEqual(json.loads(diff.old_data),
                          {'name': 'Bar', 'surname': 'Doe',
-                          u'birthdate': '2010-10-01',
-                          u'updated_at': '2015-01-07 23:12:11.292032+0000'})
+                          'birthdate': '2010-10-01',
+                          'updated_at': '2015-01-07 23:12:11.292032+0000'})
         self.assertEqual(json.loads(diff.new_data),
                          {'name': 'John',
                           'birthdate': '2008-11-02',
@@ -116,9 +116,9 @@ class ModeldiffTests(TestCase):
         self.assertEqual(diff.action, 'delete')
         self.assertEqual(diff.model_id, person_id)
         self.assertEqual(json.loads(diff.old_data),
-                         {u'name': u'Foo', u'surname': u'Doe',
-                          u'birthdate': '2007-12-05',
-                          u'updated_at': '2015-01-07 22:00:10.292032+0000'})
+                         {'name': 'Foo', 'surname': 'Doe',
+                          'birthdate': '2007-12-05',
+                          'updated_at': '2015-01-07 22:00:10.292032+0000'})
         self.assertEqual(diff.new_data, '')
 
     def test_set_to_none(self):
@@ -129,11 +129,11 @@ class ModeldiffTests(TestCase):
         self.assertEqual(diff.action, 'update')
         self.assertEqual(diff.model_id, self.person.id)
         self.assertEqual(json.loads(diff.old_data),
-                         {u'name': u'Foo', u'surname': u'Doe',
-                          u'birthdate': u'2007-12-05',
-                          u'updated_at': '2015-01-07 22:00:10.292032+0000'})
+                         {'name': 'Foo', 'surname': 'Doe',
+                          'birthdate': '2007-12-05',
+                          'updated_at': '2015-01-07 22:00:10.292032+0000'})
         self.assertEqual(json.loads(diff.new_data),
-                         {u'surname': None})
+                         {'surname': None})
 
     def test_update_parent_field_model(self):
         person_property = PersonPropertyModel.objects.create(
@@ -162,7 +162,7 @@ class ModeldiffTests(TestCase):
         self.assertEqual(diffs[0].model_id, self.person.id)
 
         self.assertEqual(diffs[1].action, 'delete')
-        self.assertEqual(diffs[1].model_name, u'modeldiff.PersonPropertyModel')
+        self.assertEqual(diffs[1].model_name, 'modeldiff.PersonPropertyModel')
         self.assertEqual(diffs[1].model_id, person_property_id)
 
     # Geo tests
@@ -179,10 +179,11 @@ class ModeldiffTests(TestCase):
                          {'name': 'Foo', 'surname': 'Doe',
                           'birthdate': '2007-12-05',
                           'updated_at': '2015-01-07 22:00:10.292032+0000',
-                          'the_geom': 'POINT(0.00000000 0.00000000)'
+                          'the_geom': 'POINT (0.00000000 0.00000000)'
                           })
-        self.assertEqual(precision_wkt(diff.the_geom, 8),
-                         'POINT(0.00000000 0.00000000)')
+        wkt_w = WKTWriter(precision=8)
+        self.assertEqual(wkt_w.write(diff.the_geom),
+                         b'POINT (0.00000000 0.00000000)')
 
     def test_geo_modify_model(self):
         self.persongeo.name = 'Bar'
@@ -195,10 +196,10 @@ class ModeldiffTests(TestCase):
         self.assertEqual(diff.action, 'update')
         self.assertEqual(diff.model_id, self.persongeo.id)
         self.assertEqual(json.loads(diff.old_data),
-                         {u'name': u'Foo', u'surname': u'Doe',
-                          u'birthdate': '2007-12-05',
-                          u'updated_at': '2015-01-07 22:00:10.292032+0000',
-                          u'the_geom': u'POINT(0.00000000 0.00000000)'})
+                         {'name': 'Foo', 'surname': 'Doe',
+                          'birthdate': '2007-12-05',
+                          'updated_at': '2015-01-07 22:00:10.292032+0000',
+                          'the_geom': 'POINT (0.00000000 0.00000000)'})
         self.assertEqual(json.loads(diff.new_data),
                          {'name': 'Bar',
                           'birthdate': '2010-10-01',
@@ -216,9 +217,9 @@ class ModeldiffTests(TestCase):
         self.assertEqual(diff.model_id, self.persongeo.id)
         self.assertEqual(json.loads(diff.old_data),
                          {'name': 'Bar', 'surname': 'Doe',
-                          u'birthdate': '2010-10-01',
-                          u'updated_at': '2015-01-07 23:12:11.292032+0000',
-                          u'the_geom': u'POINT(0.00000000 0.00000000)'})
+                          'birthdate': '2010-10-01',
+                          'updated_at': '2015-01-07 23:12:11.292032+0000',
+                          'the_geom': 'POINT (0.00000000 0.00000000)'})
         self.assertEqual(json.loads(diff.new_data),
                          {'name': 'John',
                           'birthdate': '2008-11-02',
@@ -234,10 +235,10 @@ class ModeldiffTests(TestCase):
         self.assertEqual(diff.action, 'delete')
         self.assertEqual(diff.model_id, persongeo_id)
         self.assertEqual(json.loads(diff.old_data),
-                         {u'name': u'Foo', u'surname': u'Doe',
-                          u'birthdate': '2007-12-05',
-                          u'updated_at': '2015-01-07 22:00:10.292032+0000',
-                          u'the_geom': u'POINT(0.00000000 0.00000000)'})
+                         {'name': 'Foo', 'surname': 'Doe',
+                          'birthdate': '2007-12-05',
+                          'updated_at': '2015-01-07 22:00:10.292032+0000',
+                          'the_geom': 'POINT (0.00000000 0.00000000)'})
         self.assertEqual(diff.new_data, '')
 
     def test_geo_set_to_none(self):
@@ -249,12 +250,12 @@ class ModeldiffTests(TestCase):
         self.assertEqual(diff.action, 'update')
         self.assertEqual(diff.model_id, self.persongeo.id)
         self.assertEqual(json.loads(diff.old_data),
-                         {u'name': u'Foo', u'surname': u'Doe',
-                          u'birthdate': u'2007-12-05',
-                          u'updated_at': '2015-01-07 22:00:10.292032+0000',
-                          u'the_geom': u'POINT(0.00000000 0.00000000)'})
+                         {'name': 'Foo', 'surname': 'Doe',
+                          'birthdate': '2007-12-05',
+                          'updated_at': '2015-01-07 22:00:10.292032+0000',
+                          'the_geom': 'POINT (0.00000000 0.00000000)'})
         self.assertEqual(json.loads(diff.new_data),
-                         {u'surname': None, u'the_geom': None})
+                         {'surname': None, 'the_geom': None})
 
     def test_update_parent_field_geo_model(self):
 

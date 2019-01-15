@@ -1,13 +1,13 @@
-from django.contrib.gis.db import models
-from django.forms.models import model_to_dict
-from django.contrib.gis.utils.wkt import precision_wkt
-from django.utils import timezone
+import datetime
+import json
+
 from django.conf import settings
+from django.contrib.gis.db import models
+from django.contrib.gis.geos import WKTWriter
+from django.forms.models import model_to_dict
+from django.utils import timezone
 
 from modeldiff.request import GlobalRequest
-
-import json
-import datetime
 
 
 class ModeldiffMixin(models.Model):
@@ -39,7 +39,6 @@ class Modeldiff(ModeldiffMixin, models.Model):
 
 class Geomodeldiff(ModeldiffMixin, models.Model):
     the_geom = models.GeometryField(srid=4326, null=True, blank=True)
-    objects = models.GeoManager()
 
 
 class SaveModeldiffMixin(models.Model):
@@ -69,7 +68,7 @@ class SaveModeldiffMixin(models.Model):
         else:
             try:
                 diff.username = GlobalRequest().user.username
-            except:
+            except Exception:
                 pass
 
         unique_field = getattr(self.Modeldiff, 'unique_field', None)
@@ -163,7 +162,7 @@ class SaveModeldiffMixin(models.Model):
         else:
             try:
                 diff.username = GlobalRequest().user.username
-            except:
+            except Exception:
                 pass
 
         if self.pk:
@@ -230,7 +229,7 @@ class SaveGeomodeldiffMixin(models.Model):
         else:
             try:
                 diff.username = GlobalRequest().user.username
-            except:
+            except Exception:
                 pass
 
         unique_field = getattr(self.Modeldiff, 'unique_field', None)
@@ -242,9 +241,9 @@ class SaveGeomodeldiffMixin(models.Model):
             # get original object in database
             try:
                 original = self.__class__.objects.get(pk=self.pk)
-            except:
+            except Exception:
                 pass
-
+        wkt_w = WKTWriter(precision=geom_precision)
         if original:
             diff.model_id = self.pk
             diff.action = 'update'
@@ -282,7 +281,7 @@ class SaveGeomodeldiffMixin(models.Model):
             # save original geometry
             geom = getattr(original, geom_field)
             if geom:
-                old_values[geom_field] = precision_wkt(geom, geom_precision)
+                old_values[geom_field] = wkt_w.write(geom).decode('utf8')
             else:
                 old_values[geom_field] = None
 
@@ -290,7 +289,7 @@ class SaveGeomodeldiffMixin(models.Model):
             new_geom = getattr(self, geom_field)
             diff.the_geom = new_geom
             if new_geom:
-                new_geom_value = precision_wkt(new_geom, geom_precision)
+                new_geom_value = wkt_w.write(new_geom).decode('utf8')
             else:
                 new_geom_value = None
 
@@ -320,8 +319,7 @@ class SaveGeomodeldiffMixin(models.Model):
             new_geom = getattr(self, geom_field)
             diff.the_geom = new_geom
             if new_geom:
-                new_values[geom_field] = precision_wkt(new_geom,
-                                                       geom_precision)
+                new_values[geom_field] = wkt_w.write(new_geom).decode('utf8')
             diff.new_data = json.dumps(new_values)
             diff.save()
 
@@ -354,7 +352,7 @@ class SaveGeomodeldiffMixin(models.Model):
         else:
             try:
                 diff.username = GlobalRequest().user.username
-            except:
+            except Exception:
                 pass
 
         if self.pk:
@@ -383,8 +381,9 @@ class SaveGeomodeldiffMixin(models.Model):
             # save geometry
             geom = getattr(self, geom_field)
             diff.the_geom = geom
+            wkt_w = WKTWriter(precision=geom_precision)
             if geom:
-                old_values[geom_field] = precision_wkt(geom, geom_precision)
+                old_values[geom_field] = wkt_w.write(geom).decode('utf8')
             else:
                 old_values[geom_field] = None
 
