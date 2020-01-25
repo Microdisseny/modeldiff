@@ -5,6 +5,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.messages',
     'django.contrib.sessions',
     'django.contrib.sites',
 
@@ -15,12 +16,14 @@ INSTALLED_APPS = [
 
 USE_TZ = True
 
-SPATIALITE_LIBRARY_PATH = 'mod_spatialite.so'
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.spatialite',
-        'NAME': 'database.db',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME':     'testdb',
+        'USER':     'postgres',
+        'PASSWORD': '',
+        'HOST':     'localhost',
+        'PORT':     '',
     }
 }
 
