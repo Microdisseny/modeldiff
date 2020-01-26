@@ -2,7 +2,7 @@ django modeldiff
 ================
 
 [![Build Status](https://travis-ci.org/microdisseny/modeldiff.svg?branch=master)](https://travis-ci.org/microdisseny/modeldiff)
-[![Coverage Status](https://coveralls.io/repos/github/microdisseny/modeldiff/badge.svg?branch=master)](https://coveralls.io/github/microdisseny/modeldiff?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/Microdisseny/modeldiff/badge.svg?branch=master)](https://coveralls.io/github/Microdisseny/modeldiff?branch=master)
 
 When saving a model, store the changes in a modeldiff object so they can be applied elsewhere. Also helps tracking user's modifications
 
