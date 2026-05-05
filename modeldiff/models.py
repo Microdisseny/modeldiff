@@ -296,6 +296,10 @@ class SaveGeomodeldiffMixin(models.Model):
             if not new_geom_value == old_values[geom_field]:
                 new_values[geom_field] = new_geom_value
 
+            if not new_values:
+                super(SaveGeomodeldiffMixin, self).save(*args, **kwargs)
+                return
+
             diff.old_data = json.dumps(old_values)
             diff.new_data = json.dumps(new_values)
             diff.save()
